@@ -4,6 +4,8 @@ This script helps you create a Blender mesh from your Didgelab didgeridoo shape.
 
 Find more information about this script on the [Didgitaldoo Website](https://didgitaldoo.github.io/).
 
+## Table of Contents
+
 - [Didge2Blender](#didge2blender)
   * [Getting started](#getting-started)
     + [Download this repository](#download-this-repository)
@@ -16,8 +18,6 @@ Find more information about this script on the [Didgitaldoo Website](https://did
     + [Divide the didgeridoo into smaller segments](#divide-the-didgeridoo-into-smaller-segments)
     + [Other parameters](#other-parameters)
   * [License](#license)
-
-<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
 ## Getting started
 
