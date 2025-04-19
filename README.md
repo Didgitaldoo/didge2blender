@@ -6,18 +6,21 @@ Find more information about this script on the [Didgitaldoo Website](https://did
 
 ## Table of Contents
 
-- [Didge2Blender](#didge2blender)
-  * [Getting started](#getting-started)
-    + [Download this repository](#download-this-repository)
-    + [Run the example Blender file](#run-the-example-blender-file)
-    + [Export to STL](#export-to-stl)
-  * [Using your own Didgelab shape.](#using-your-own-didgelab-shape)
-    + [Introduction](#introduction)
-    + [Adding the shape to the script](#adding-the-shape-to-the-script)
-    + [Create a bended Didgeridoo shape](#create-a-bended-didgeridoo-shape)
-    + [Divide the didgeridoo into smaller segments](#divide-the-didgeridoo-into-smaller-segments)
-    + [Other parameters](#other-parameters)
-  * [License](#license)
+[Getting started](#getting-started)
+
+* [Download this repository](#download-this-repository)
+* [Run the example Blender file](#run-the-example-blender-file)
+* [Export to STL](#export-to-stl)
+
+[Using your own Didgelab shape.](#using-your-own-didgelab-shape)
+
+* [Introduction](#introduction)
+* [Adding the shape to the script](#adding-the-shape-to-the-script)
+* [Create a bended Didgeridoo shape](#create-a-bended-didgeridoo-shape)
+* [Divide the didgeridoo into smaller segments](#divide-the-didgeridoo-into-smaller-segments)
+* [Other parameters](#other-parameters)
+
+[License](#license)
 
 ## Getting started
 
