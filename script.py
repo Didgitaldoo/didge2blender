@@ -36,6 +36,7 @@ geo = [[0.0, 31.0],
  [1789.0, 85.0]]
 
 split_it = True  # flat to switch splitting on and off
+
 SPLIT_WIDENING = "split_widening"
 SPLIT_NARROWING = "split_narrowing"
 
@@ -263,11 +264,13 @@ zs = set([float(z) for z in np.arange(0, geo[-1][0], z_resolution)])
 
 for g in geo:
     zs.add(g[0])
-for split in splits:
-    z = split["z"]
-    zs.add(z)
-    zs.add(z+joint_length/2)
-    zs.add(z-joint_length/2)
+
+if split_it:
+    for split in splits:
+        z = split["z"]
+        zs.add(z)
+        zs.add(z+joint_length/2)
+        zs.add(z-joint_length/2)
 zs.add(mouthpiece_length)
 
 zs = sorted(list(zs))
@@ -284,6 +287,16 @@ get_subgeo = lambda geo, z1, z2 : list(filter(lambda segment: segment[0]>=z1 and
 parts = []
 
 pos=0
+
+if not split_it:
+    splits = [
+    {#0
+        "z": geo[0][0],
+        "type": SPLIT_WIDENING
+    }    
+    ]
+
+
 for split in splits:
 
     if len(parts)==0:
@@ -320,9 +333,7 @@ for split in splits:
         })
         
         pos = split["z"]+joint_length/2
-    
-    
-    
+        
 parts.append({
     "type": "normal",
     "name": "%02d" % len(parts) + "_normal",
