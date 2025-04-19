@@ -101,7 +101,7 @@ Next, we assume that you would like to create a bended Didgeridoo shape, e.g., t
 
 <img src="images/joints.png" />
 
-The [example script](blob/main/script.py#L42-L103) shows how to create these joints. First, you have to set this variable `split_it=True`. Then, you can define the joints.
+The [example script](script.py#L42-L103) shows how to create these joints. First, you have to set this variable `split_it=True`. Then, you can define the joints.
 
 ```
 {
