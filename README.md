@@ -1,8 +1,6 @@
 # Didge2Blender
 
-This script helps you create a Blender mesh from your Didgelab didgeridoo shape. Then, you can export the Blender mesh to STL for 3d printing.
-
-Find more information about this script on the [Didgitaldoo Website](https://didgitaldoo.github.io/).
+This script helps you create a Blender mesh from your Didgelab didgeridoo shape. Then, you can export the Blender mesh to STL for 3d printing. Find more information about this script on the [Didgitaldoo Website](https://didgitaldoo.github.io/).
 
 ## Table of Contents
 
