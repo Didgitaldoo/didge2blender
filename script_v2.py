@@ -11,8 +11,6 @@ import json
 
 geo=[[0.0, 32.0], [54.9, 34.7], [137.0, 31.6], [168.0, 38.3], [257.2, 35.1], [337.3, 36.0], [409.5, 38.6], [471.6, 36.3], [549.5, 37.1], [609.9, 35.0], [669.9, 32.5], [716.0, 33.6], [775.8, 29.5], [883.5, 29.4], [950.5, 31.8], [1021.2, 28.8], [1099.5, 33.0], [1145.8, 37.3], [1198.3, 33.3], [1275.8, 37.8], [1349.6, 36.4], [1425.8, 36.7], [1466.3, 36.7], [1539.6, 44.0], [1638.8, 47.7], [1694.9, 48.5], [1704.3, 47.9], [1734.2, 58.2], [1764.1, 69.1], [1794.1, 79.3], [1824.0, 86.0], [1854.0, 86.8], [1883.9, 83.7], [1913.9, 78.2], [1943.8, 76.3], [1973.8, 65.0], [2019.0, 52.4], [2113.8, 49.1], [2170.3, 47.8], [2228.8, 51.5], [2313.6, 48.9], [2355.3, 45.0], [2420.2, 49.8], [2513.2, 53.5], [2578.6, 51.3], [2652.2, 52.6], [2712.6, 58.2], [2781.4, 56.1], [2836.5, 61.1]]
 
-#geo = [[0.0, 30], [2600, 30]]
-
 splits = [
  200,
  400,
@@ -20,38 +18,28 @@ splits = [
  600,
  800,
  1000,
- 1150,
- 1250,
- 1350,
+ 1170,
+ 1280,
  1450,
  1550,
  1650,
  1800,
  2000,
+ 2100,
  2200,
- 2300,
  2400,
- 2500,
  2600]
 
 # debug configuration to creaty only a subset of the meshes
 create_partly = False
 # create_partly = True
-# create_partly_ids = [0,1,2]
+# create_partly_ids = [3]
 
 split_it = True  # flat to switch splitting on and off
 
 n_circle_segments = 64  # how many segments make a circle
 z_resolution = 4  # create a segment every z_resolution mm
 wall_thickness = 4 # wall thickness
-
-
-# these indizes define on which parts of the circle should be a nose and the cut for the nose
-nose_size = 0.2 # the size of the nose. 0.1 means that 10% of the ring is the nose
-nose_neg_leave_indizes = np.arange(1, np.ceil(nose_size*n_circle_segments)+1, 1)
-nose_neg_leave_indizes = [int(x) for x in nose_neg_leave_indizes]
-nose_pos_leave_indizes = list(filter(lambda x : x not in nose_neg_leave_indizes, range(n_circle_segments)))
-
 
 # mouthpiece parameters
 mouthpiece_length=10 # how long is the mouthpiece part in mm
@@ -61,11 +49,12 @@ mouthpiece_resolution=0.4  # the mouthpiece has a finer resolution
 
 #joint parameters
 joint_length = 3   # how long are the joints in multiples of the resolution
+joint_sharp_edge_thickness = 1  # thickness of the walls at the joints
 
 scene = bpy.context.scene
 
-curve = None
-numbers = [str(i) for i in range(10)]
+if not split_it:
+    splits = [geo[-1][0]]
 
 # create a mesh object and insert into scene
 def object_from_data(data, name, scene, select=True):
@@ -269,9 +258,13 @@ def create_mesh():
                 last_inner_ring = inner_ring
                 last_outer_ring = outer_ring
 
-            elif joint_z_mouthpiece_pos and z < joint_z_mouthpiece_pos:
-                # joint directed mouthpiece
-                outer_diameter -= wall_thickness
+            elif joint_z_mouthpiece_pos and z <= joint_z_mouthpiece_pos:
+                # joint directed towards mouthpiece
+                l = joint_length * wall_thickness # length of the joint
+                a = -(outer_diameter-(inner_diameter+2*joint_sharp_edge_thickness))/l # slope of the joint
+                _z = l-(z-last_split_z)
+                outer_diameter = outer_diameter + a*_z
+
                 inner_ring = make_vertex_ring(data, z, inner_diameter)
                 outer_ring = make_vertex_ring(data, z, outer_diameter)
 
@@ -280,29 +273,16 @@ def create_mesh():
                     connect_rings(data, outer_ring, last_outer_ring)
                 last_inner_ring = inner_ring
                 last_outer_ring = outer_ring
-            elif joint_z_bellend_pos and z == joint_z_mouthpiece_pos:
-                # last segment of the joint directed towards mouthpiece
-                inner_ring = make_vertex_ring(data, z, inner_diameter)
-                middle_ring = make_vertex_ring(data, z, outer_diameter - wall_thickness)
-                outer_ring = make_vertex_ring(data, z, outer_diameter)
-                connect_rings(data, outer_ring, middle_ring)
-                connect_rings(data, inner_ring, last_inner_ring)
-                connect_rings(data, middle_ring, last_outer_ring)
-                last_inner_ring = inner_ring
-                last_outer_ring = outer_ring
-            elif joint_z_bellend_pos and z == joint_z_bellend_pos:
+            elif joint_z_bellend_pos and z >= joint_z_bellend_pos:
                 # first segment of bellend facing joint
-                inner_ring = make_vertex_ring(data, z, inner_diameter)
-                outer_ring = make_vertex_ring(data, z, outer_diameter)
-                middle_ring = make_vertex_ring(data, z, inner_diameter + wall_thickness)
-                connect_rings(data, inner_ring, last_inner_ring)
-                connect_rings(data, outer_ring, last_outer_ring)
-                connect_rings(data, inner_ring, middle_ring)
-                last_inner_ring = middle_ring
-                last_outer_ring = outer_ring
-            elif joint_z_bellend_pos and z > joint_z_bellend_pos:
-                # joint directed towards bellend
-                inner_diameter += wall_thickness
+                # r = (z-joint_z_bellend_pos)/(joint_length*z_resolution)
+                # diameter = inner_diameter + 2*r*(wall_thickness-joint_sharp_edge_thickness)
+
+                l = joint_length * wall_thickness # length of the joint
+                a = (outer_diameter-(inner_diameter+2*joint_sharp_edge_thickness))/l # slope of the joint
+                _z = z-joint_z_bellend_pos
+                inner_diameter += _z*a                
+
                 inner_ring = make_vertex_ring(data, z, inner_diameter)
                 outer_ring = make_vertex_ring(data, z, outer_diameter)
                 connect_rings(data, inner_ring, last_inner_ring)
@@ -327,10 +307,6 @@ def create_mesh():
 
 def make_nose(mesh1_name, mesh2_name, z, diameter):
     
-    # create triangle for cutout
-    # z0 = 0.00005+z
-    # z1 = z0 + joint_length*z_resolution
-
     joint1 = bpy.data.objects[mesh1_name]
     joint2 = bpy.data.objects[mesh2_name]
 
@@ -422,8 +398,6 @@ def make_noses():
 
 
 def delete_all_objects():
-    # bpy.ops.object.select_all(action='SELECT')
-    # bpy.ops.object.delete(use_global=False, confirm=False)
     for obj in bpy.data.objects:
         if obj.name.lower() != "curve":
             bpy.data.objects.remove(obj, do_unlink=True)
@@ -437,7 +411,5 @@ def run():
     create_mesh()
     make_noses()
     add_curve_modifier()
-
-
 
 run()            
